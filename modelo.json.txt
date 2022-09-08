@@ -1,0 +1,54 @@
+Estrutura JSON para inserir usuários via API php (api.php)
+{
+    "requisicao":"add",
+    "nome":"Maria das Couves",
+    "usuario":"mariac",
+    "senha":"123654",
+    "nivel":"admin"
+}
+
+Estrutura JSON para listar por nome ou por usuario
+os Usuários via API php (api.php)
+
+{
+    "requisicao":"listar",
+    "nome":"a",
+    "start":0,
+    "limit":10
+}
+
+Estrutura JSON para atualizar por nome ou por usuario
+os Usuários via API php (api.php)
+
+{
+    "requisicao":"editar",
+    "nome":"Zézin do ZAP",
+    "usuario":"ZéPAO",
+    "senha":12345,
+    "nivel":"caixa",
+    "id":2
+}
+
+Estrutura JSON para excluir por nome ou por usuario
+os Usuários via API php (api.php)
+
+{
+    "requisicao":"excluir",
+    "id":1
+}
+
+Estrutura JSON para login por nome ou por usuario
+os Usuários via API php (api.php)
+
+{
+    "requisicao":"login",
+    "usuario": "ZéPAO",
+    "senha":"12345"
+}
+
+Estrutura JSON para ativar por nome ou por usuario
+os Usuários via API php (api.php)
+{
+    "requisicao":"ativar",
+    "id":3
+}
