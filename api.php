@@ -85,7 +85,7 @@ else if($postjson['requisicao']=='editar'){
                 'nome'              =>$res[$i]['nome'],
                 'usuario'           =>$res[$i]['usuario'],
                 'nivel'             =>$res[$i]['nivel'],
-                'ativo' =>          $res[$i]['ativo']
+                'ativo'             =>$res[$i]['ativo']
             );
     }
 
