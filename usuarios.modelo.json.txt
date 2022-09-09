@@ -1,4 +1,4 @@
-Estrutura JSON para inserir usuários via API php (api.php)
+Estrutura JSON para inserir usuários via API php (usuarios.php)
 {
     "requisicao":"add",
     "nome":"Maria das Couves",

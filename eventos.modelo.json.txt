@@ -1,0 +1,47 @@
+Estrutura JSON para inserir eventos via API php (eventos.php)
+
+{
+    "requisicao":"add",
+    "nome":"Chuleta",
+    "data":"2023-03-02",
+    "ativo": 1,
+    "capacidade":"100",
+    "usuarios_id":"2"
+}
+
+Estrutura JSON para desativar eventos via API php (eventos.php)
+
+{
+    "requisicao":"desativar",
+    "id":"8",
+    "ativo": 0
+}
+
+Estrutura JSON para listar por nome os Usuários via API php (eventos.php)
+
+{
+    "requisicao":"listar",
+    "nome":"a",
+    "start":0,
+    "limit":10
+}
+
+Estrutura JSON para atualizar por nome os Usuários via API php (api.php)
+
+{
+    "requisicao":"editar",
+    "nome":"Chuletta",
+    "data":"2022-09-09",
+    "capacidade":"99",
+    "ativo": 0, 
+    "usuarios_id":"1",
+    "id": 3
+}
+
+Estrutura JSON para excluir por nome ou por usuario
+os Usuários via API php (api.php)
+
+{
+    "requisicao":"excluir",
+    "id":1
+}
