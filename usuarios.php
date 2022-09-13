@@ -89,9 +89,9 @@ else if($postjson['requisicao']=='editar'){
             );
     }
 
-    if ($query){
+    if (count($res)> 0){
         $result = json_encode(array('success'=>true, 'result'=>$dados));
-    } else {
+    } else{
         $result = json_encode(array('success'=>false,'msg' =>'Falha ao efetuar login!'));
     }
     echo $result;
