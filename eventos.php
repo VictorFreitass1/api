@@ -40,6 +40,7 @@ else if ($postjson['requisicao']=='listar') {
             'data'              =>$res[$i]['data'],
             'capacidade'        =>$res[$i]['capacidade'],
             'ativo'             =>$res[$i]['ativo'],
+            'usuarios_id'       =>$res[$i]['usuarios_id']
         );
     } 
     if(count($res)>0){
