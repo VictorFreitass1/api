@@ -1,5 +1,6 @@
 <?php 
 class Usuario{
+    // atributos
     private $id;
     private $nome;
     private $usuario;
@@ -7,7 +8,8 @@ class Usuario{
     private $senha_original;
     private $nivel;
     private $ativo;
-    // declarando métodos de acesso (Getters e Setters)
+    private $avatar;
+    // declaração de métodos de acesso (Getters an Setters)
     public function getId(){return $this->id;}
     public function getNome(){return $this->nome;}
     public function getUsuario(){return $this->usuario;}
@@ -15,7 +17,8 @@ class Usuario{
     public function getSenhaOriginal(){return $this->senha_original;}
     public function getNivel(){return $this->nivel;}
     public function getAtivo(){return $this->ativo;}
-
+    public function getAvatar(){return $this->avatar;}
+    
     public function setId($value){$this->id = $value;}
     public function setNome($value){$this->nome = $value;}
     public function setUsuario($value){$this->usuario = $value;}
@@ -23,10 +26,11 @@ class Usuario{
     public function setSenhaOriginal($value){$this->senha_original = $value;}
     public function setNivel($value){$this->nivel = $value;}
     public function setAtivo($value){$this->ativo = $value;}
+    public function setAvatar($value){$this->avatar = $value;}
 
     public function loadById($_id){
         $sql = new Sql();
-        $result = $sql->select("SELECT * FROM usuarios WHERE id = :id", array (':id'=>$_id));
+        $results = $sql->select("SELECT * FROM usuarios WHERE id = :id",array(':id'=>$_id));
         if(count($results)>0){
             $this->setData($results[0]);
         }
@@ -39,15 +43,14 @@ class Usuario{
         $this->setSenhaOriginal($dados['senha_original']);
         $this->setNivel($dados['nivel']);
         $this->setAtivo($dados['ativo']);
-
+        $this->setAvatar($dados['avatar']);
     }
-    
     public static function getList(){
-        $sql = new Sql ();
+        $sql = new Sql();
         return $sql->select("SELECT * FROM usuarios ORDER BY nome");
     }
     public static function search($_nome){
-        $sql = new Sql ();
+        $sql = new Sql();
         return $sql->select("SELECT * FROM usuarios WHERE nome LIKE :nome",
             array(":nome"=>"%".$_nome."%"));
     }
@@ -55,50 +58,53 @@ class Usuario{
         $sql = new Sql();
         $senhaCrip = md5($_senha);
         $res = $sql->select("SELECT * FROM usuarios WHERE usuario = :usuario AND senha = :senha",
-            array(":usuario"=>$_usuario, ":senha"=>$senhaCrip));
-        if(count($res)[0]){
+           array(":usuario"=>$_usuario,":senha"=>$senhaCrip));
+        if(count($res)>0){
             $this->setData($res[0]);
         }
     }
     public function insert(){
         $sql = new Sql();
-        $res = $sql->select("CALL sp_user_insert(:nome, :usuario, :senha, :nivel)",
+        $res = $sql->select("CALL sp_user_insert(:nome, :usuario, :senha, :nivel, :avatar)",
         array(
-            ":nome"=> $this->getNome(),
-            ":usuario"=> $this->getUsuario(),
-            ":senha"=>$this->getSenha(),
-            //":senha"=> md5($this->getSenha()),
-            ":nivel"=> $this->getNivel()
+            ":nome"=>$this->getNome(),
+            ":usuario"=>$this->getUsuario(),
+            ":senha"=>$this->getSenha(),// estamos usando o MD5 na procedure MySql
+            ":nivel"=>$this->getNivel(),
+            ":avatar"=>$this->getAvatar()
         ));
-        if (count($res)>0){
-            $this->setData($res[0]);
+        if(count($res)>0){
+            $this->setId($res[0]['id']);
         }
     }
-    public function update($_id){
+    public function update() : bool{
         $sql = new Sql();
-        $sql-> query ("UPDATE usuarios SET nome= :nome, senha = :senha, nivel = :nivel WHERE id = :id", array(
-        ":nome"=>$this->getNome(),
-        ":id"=>$this->getId(),
-        ":senha"=>$md5($this->getSenha()),
-        ":nivel"=>$this->getNivel()
-    ));
-    }
-    
-    public function delete(){
-        $sql - new Sql();
-        $sql -> query("DELETE FROM usuarios WHERE id = :id", array(":id"=>$this->getID()));
-    }
+        $res = $sql->query("UPDATE usuarios SET nome= :nome, senha = :senha, nivel = :nivel, 
+        avatar = :avatar WHERE id = :id",
+        array(
+            ":nome"=>$this->getNome(),
+            ":id"=>$this->getId(),
+            ":senha"=>md5($this->getSenha()),
+            ":nivel"=>$this->getNivel(),
+            ":avatar"=>$this->getAvatar()
+        ));
+        if($res){
+            return true; 
+        }else{
+            return false;
+        }
 
-    public function __construct(){ $_nome="", $_usuario="", $_senha="", $_ativo=""
+    }
+    public function delete(){
+        $sql = new Sql();
+        $sql->query("DELETE FROM usuarios WHERE id = :id",array(":id"=>$this->getId()));
+    }
+    public function __construct($_nome="", $_usuario="", $_senha="", $_nivel="",$_ativo="",$_avatar=""){
         $this->nome = $_nome;
         $this->senha = $_senha;
-        $this->nivel = $_nievl;
+        $this->nivel = $_nivel;
         $this->usuario = $_usuario;
         $this->ativo = $_ativo;
-
-        //$lista = Usuario::search("we");
-        // $us = new Usuario();
-        // $us ->setNome("Maria");
     }
 }
 ?>

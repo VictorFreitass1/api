@@ -39,7 +39,7 @@ if($postjson['requisicao']=='avatar'){
 }
 
 if($postjson['requisicao']=='add'){
-    $query = $pdo->prepare("insert into usuarios set nome = :nome, usuario=:usuario,senha=:senha, senha_original=:senha_original, nivel=:nivel, ativo = 1, avatar=:avatar");
+    $query = $pdo->prepare("insert into usuarios set nome = :nome, usuario=:usuario,senha=:senha, senha_original=:senha_original, nivel=:nivel, ativo = 1,avatar=:avatar");
     $query->bindValue(":nome", $postjson['nome']);
     $query->bindValue(":usuario", $postjson['usuario']);
     $query->bindValue(":senha", md5($postjson['senha']));
@@ -55,8 +55,8 @@ if($postjson['requisicao']=='add'){
         $result = json_encode(array('success'=>false,'msg'=>'Falha ao inserir o usuário'));
     }
     echo $result;
-}// Final requisição add
-else if ($postjson['requisicao']=='listar') {
+}// final requisição add 
+else if($postjson['requisicao']=='listar'){
     if($postjson['nome']==''){
         $query = $pdo->query("SELECT * FROM usuarios order BY id desc limit $postjson[start],$postjson[limit]");
     }else{
@@ -64,25 +64,26 @@ else if ($postjson['requisicao']=='listar') {
         $query = $pdo->query("SELECT * FROM usuarios WHERE nome LIKE '$busca' or usuario LIKE '$busca' order BY id desc limit $postjson[start], $postjson[limit] ");
     }
     $res = $query->fetchAll(PDO::FETCH_ASSOC);
-    for($i=0;$i < count($res);$i++){
-        $dados [][] = array(
-            'id'                =>$res[$i]['id'],
-            'nome'              =>$res[$i]['nome'],
-            'usuario'           =>$res[$i]['usuario'],
-            'senha'             =>$res[$i]['senha'],
-            'senha_original'    =>$res[$i]['senha_original'],
-            'nivel'             =>$res[$i]['nivel'],
-            'ativo'             =>$res[$i]['ativo']
+    for($i=0;$i < count($res); $i++){
+        $dados[][] = array(
+            'id'=>$res[$i]['id'],
+            'nome'=>$res[$i]['nome'],
+            'usuario'=>$res[$i]['usuario'],
+            'senha'=>$res[$i]['senha'],
+            'senha_original'=>$res[$i]['senha_original'],
+            'nivel'=>$res[$i]['nivel'],
+            'ativo'=>$res[$i]['ativo'],
+            'avatar'=>$res[$i]['avatar']
         );
-    } 
+    }
     if(count($res)>0){
-        $result = json_encode(array('success'=>true, 'result'=>$res));
+        $result = json_encode(array('success'=>true,'result'=>$dados));
     }
     else{
-        $result = json_encode(array('success'=>false, 'result'=>'Eita Cláudia....'));
+        $result = json_encode(array('success'=>false,'result'=>'Eita Cláudia....'));
     }
     echo ($result);
-}// Fim do listar
+}// fim do listar
 else if($postjson['requisicao']=='editar'){
     $query = $pdo->prepare("UPDATE usuarios SET nome=:nome, usuario=:usuario, senha= :senha, senha_original = :senha_original, nivel=:nivel WHERE id = :id");
     $query->bindValue(":nome",$postjson['nome']);
@@ -90,7 +91,9 @@ else if($postjson['requisicao']=='editar'){
     $query->bindValue(":senha",md5($postjson['senha']));
     $query->bindValue(":senha_original",$postjson['senha']);
     $query->bindValue(":nivel",$postjson['nivel']);
+    $query->bindValue(":avatar",$postjson['avatar']);
     $query->bindValue(":id",$postjson['id']);
+
     $query->execute();
     if ($query){
         $result = json_encode(array('success'=>true, 'msg'=>"Deu tudo certo com alteração!"));
@@ -119,7 +122,8 @@ else if($postjson['requisicao']=='login'){
             'nome'=>$res[$i]['nome'],
             'usuario'=>$res[$i]['usuario'],
             'nivel'=>$res[$i]['nivel'],
-            'ativo'=>$res[$i]['ativo']
+            'ativo'=>$res[$i]['ativo'],
+            'avatar'=>$res[$i]['avatar']
         );
     }
     if (count($res)> 0){
