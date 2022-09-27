@@ -12,14 +12,6 @@ $host = 'localhost'; // 127.0.0.1
 $usuario = 'root';
 $senha = '';
 
-/*
-// dados do servidor remoto/hospedado
-$banco = 'wellington_91';
-$host = 'softkleen.com.br'; 
-$usuario = 'apiti9111';
-$senha = '';
-*/
-
 try{
     $pdo = new PDO("mysql:dbname=$banco;host=$host","$usuario", "$senha");
 } catch (Exception $e) { 

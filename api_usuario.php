@@ -18,12 +18,11 @@ if($postjson['requisicao']=='add'){
                 $postjson['nivel'],null,
                 $postjson['avatar']);
     
-    $id = $user->insert();
-
-    if(isset($id)){
-        $result = json_encode(array('success'=>true,'id'=>$id));
+    $user->insert();
+    if($user->getId()>0){
+        $result = json_encode(array('success'=>true,'id'=>$user->getId()));
     }else{
-        $result = json_encode(array('success'=>false,'msg'=>'Falha ao inserir o usuário'));
+        $result = json_encode(array('success'=>false,'msg'=>'Falha ao inserir o usuário', ''=>$id ));
     }
     echo $result;
 }// final requisição add 
@@ -70,8 +69,8 @@ else if($postjson['requisicao']=='editar'){
 } //final da requisição Editar
 else if($postjson['requisicao']=='excluir'){
     $user = new Usuario();
-    $user->setId($postjson['id']);
-    $res = $user->delete();
+    //$user->setId();
+    $res = $user->delete($postjson['id']);
     if ($res){
         $result = json_encode(array('success'=>true, 'msg'=>"Usuário excluído com sucesso!"));
     }else{
@@ -100,7 +99,7 @@ else if($postjson['requisicao']=='login'){
 }//final do login
 else if($postjson['requisicao']=='ativar'){
     $user = new Usuario();
-    $user->setId = $postjson['id'];
+    $user->setId($postjson['id']);
     $res = $user->ativar();
     if ($res){
         $result = json_encode(array('success'=>true, 'msg'=>"Usuário Ativado com sucesso!"));
