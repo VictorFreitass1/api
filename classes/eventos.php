@@ -25,12 +25,12 @@ public function setAtivo($value){$this->ativo;}
 
 public function loadById($_id){
     $sql = new Sql ();
-    $result = $sql->select("SELECT * FROM usuarios WHERE id = :id", array (':id'=>$_id));
+    $results = $sql->select("SELECT * FROM eventos WHERE id = :id", array (':id'=>$_id));
     if(count($results)>0){
         $this->setData($results[0]);
     }
 }
-public function setData($dados){
+public function setDate($dados){
     $this->setId($dados['id']);
     $this->setNome($dados['nome']);
     $this->setData($dados['data']);
@@ -42,17 +42,43 @@ public static function getList(){
     $sql = new Sql();
     return $sql->select("SELECT * FROM eventos ORDER BY nome");
 }
+public static function search($_nome){
+    $sql = new Sql();
+    return $sql->select("SELECT * FROM eventos WHERE nome LIKE :nome",
+        array(":nome"=>"%".$_nome."%"));
+}
 public function insert(){
     $sql = new Sql();
-    $sql = $sql->select("CALL sp_event_insert(:nome, :data, :usuarios_id)",
+    $res = $sql->select("CALL sp_event_insert(:nome, :data, :capacidade, :usuarios_id)",
     array(
         ":nome"=>$this->getNome(),
         ":data"=>$this->getData(),
-        ":usuarios_id"=>$this->usuarios_id()
+        ":capacidade"=>$this->getCapacidade(),
+        ":usuarios_id"=>$this->getUsuariosId()
     ));
-    if (count($res)>0){
-        $this->setData($res[0]);
+    if(count($res)>0){
+        $this->setId($res[0]['id']);
     }
+}
+public function update() : bool{
+    $sql = new Sql();
+    $res = $sql->query("UPDATE eventos SET nome= :nome, data= :data, capacidade = :capacidade, 
+    WHERE id = :id",
+    array(
+        ":nome"=>$this->getNome(),
+        ":id"=>$this->getId(),
+        ":data"==$this->getData(),
+        ":capacidade"=>$this->getCapacidade()
+    ));
+    if($res){
+        return true; 
+    }else{
+        return false;
+    }
+}
+public function delete(){
+    $sql = new Sql();
+    $sql->query("DELETE FROM eventos WHERE id = :id",array(":id"=>$this->getId()));
 }
 
 }

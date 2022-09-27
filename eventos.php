@@ -1,87 +1,89 @@
 <?php 
-    // Api - Aplicação para recursos de app mobile
-    include_once('conn.php');
+include_once('conn.php');
 
-    // Variável que recebe o conteúdo da requisição do APP decodificando-a (json)
-    $postjson = json_decode(file_get_contents('php://input',true),true);
+//Decodificando o json que irá vir
+$postjson = json_decode(file_get_contents('php://input', true), true);
 
-if ($postjson['requisicao']=='add') {
-    $query = $pdo->prepare("insert into eventos set nome =:nome, data =:data, capacidade =:capacidade, usuarios_id =:usuarios_id, ativo = 1");
-    
-    $old_date = strtotime($postjson['data']);
-    $new_date = date('d-m-Y H:i:s', $old_date);
 
+if($postjson['requisicao'] == 'add'){
+
+    $query = $pdo->prepare("insert into eventos set nome = :nome, data = :data, capacidade=:capacidade,  ativo = 1, usuarios_id = :usuarios_id");
+    $dataAntiga = strtotime($postjson['data']);
+    $dataFormatadaParaSQL = date('Y-m-d H-i-s', $dataAntiga);
     $query->bindValue(":nome", $postjson['nome']);
-    $query->bindValue(":data", $postjson['data']);
+    $query->bindValue(":data", $dataFormatadaParaSQL);
     $query->bindValue(":capacidade", $postjson['capacidade']);
     $query->bindValue(":usuarios_id", $postjson['usuarios_id']);
     $query->execute();
+
     $id = $pdo->lastInsertId();
 
-    if ($query) {
+    if($query){
         $result = json_encode(array('success' => true, 'id' => $id));
-    } else {
-        $result = json_encode(array('success' => false, 'msg' => 'Falha ao inserir evento'));
+    }else{
+        $result = json_encode(array('success' => false, 'msg' => "Ocorreu uma falha ao inserir!"));
     }
     echo $result;
-}// Final requisição add
-else if ($postjson['requisicao']=='listar') {
-    if($postjson['nome']==''){
-        $query = $pdo->query("SELECT * FROM eventos order BY id desc limit " .$postjson['start']. "," .$postjson['limit']);
-    }else{
+}
+else if($postjson['requisicao']=='listar'){
+    if($postjson['nome'] == ''){
+        $query = $pdo->query("SELECT * FROM eventos order BY id desc limit $postjson[start], $postjson[limit]");
+    } else{
         $busca = '%'.$postjson['nome'].'%';
-        $query = $pdo->query("SELECT * FROM eventos WHERE nome LIKE '$busca' or capacidade LIKE '$busca' order BY id desc limit " .$postjson['start']. "," .$postjson ['limit']);
+        $query = $pdo->query("SELECT * FROM eventos WHERE nome LIKE '$busca' or evento LIKE '$busca' order BY id desc limit $postjson[start], $postjson[limit]");
     }
-    $res = $query->fetchAll(PDO::FETCH_ASSOC);
-    for($i=0;$i < count($res);$i++){
-        $dados [] = array(
-            'id'                =>$res[$i]['id'],
-            'nome'              =>$res[$i]['nome'],
-            'data'              =>$res[$i]['data'],
-            'capacidade'        =>$res[$i]['capacidade'],
-            'ativo'             =>$res[$i]['ativo'],
-            'usuarios_id'       =>$res[$i]['usuarios_id']
-        );
-    } 
-    if(count($res)>0){
-        $result = json_encode(array('success'=>true, 'result'=>$res));
-    }
-    else{
-        $result = json_encode(array('success'=>false, 'result'=>'Eita Cláudia....'));
-    }
-    echo ($result);
-}   // Fim do listar
-else if($postjson['requisicao']=='editar'){
-    $query = $pdo->prepare("UPDATE eventos SET nome=:nome, data=:data, capacidade =:capacidade, ativo=:ativo WHERE id=:id");
+$res = $query->fetchAll(PDO::FETCH_ASSOC);
+for($i = 0; $i < count($res); $i++) {
+    $data = new DateTime($res[$i]['data']);
+    $dados[][] = array(
+        'id'=>$res[$i]['id'],
+        'nome'=>$res[$i]['nome'],
+        'data'=>$data->format('d-m-Y H:i:s'),
+        'capacidade'=>$res[$i]['capacidade'],
+        'ativo'=>$res[$i]['ativo'],
+        'usuarios_id'=>$res[$i]['usuarios_id']
+    );
+}
+if(count($res)){
+    $result = json_encode(array('success'=>true, 'result'=>$dados));
+}else{
+    $result = json_encode(array('success'=>false, 'result'=>'0'));
+}
+echo ($result);
+}
+
+else if($postjson['requisicao'] == 'editar'){
+    $query = $pdo->prepare("update eventos SET nome=:nome, data = :data, capacidade=:capacidade WHERE id = :id");
+    $dataAntiga = strtotime($postjson['data']);
+    $dataFormatadaParaSQL = date('Y-m-d H-i-s', $dataAntiga);
     $query->bindValue(":nome", $postjson['nome']);
-    $query->bindValue(":data", $postjson['data']);
-    $query->bindValue(":capacidade", md5($postjson['capacidade']));
+    $query->bindValue(":data", $dataFormatadaParaSQL);
+    $query->bindValue(":capacidade", $postjson['capacidade']);
     $query->bindValue(":id", $postjson['id']);
     $query->execute();
-
-    if ($query) {
-        $result = json_encode(array('success' => true, 'msg' => "Alteração realizada com sucesso"));
-    } else {
-        $result = json_encode(array('success' => false, 'msg' => "Dados incorretos! Falha ao atualizar evento!"));
+    if($query){
+        $result = json_encode(array('success'=>true, 'msg'=>"Evento alterado com sucesso"));
+    }else{
+        $result = json_encode(array('success'=> false, 'msg'=> "Erro ao alterar evento"));
     }
     echo $result;
-} // Final da requisição editar
-else if ($postjson['requisicao']=='excluir'){
-    //$query = $pdo->query("DELETE FROM eventos WHERE id = $postjson[id]");
-    $query = $pdo->query("UPDATE eventos SET ativo = 0 WHERE id = $postjson[id]");
-    if ($query) {
-        $result = json_encode(array('success' => true, 'msg' => "Evento excluido com sucesso"));
-    } else {
-        $result = json_encode(array('success' => false, 'msg' => "Falha ao excluir o Evento!"));
+}
+else if($postjson['requisicao'] == 'excluir'){
+    $query = $pdo->query("UPDATE eventos set ativo = 0 WHERE id = $postjson[id]");
+    if($query){
+        $result = json_encode(array('success' => true, 'msg'=> "Evento excluido com sucesso"));
+    }else{
+        $result = json_encode(array('success' => false, 'msg'=> "Erro ao excluir evento"));
     }
-echo $result;
-} // Final do excluir
-else if ($postjson['requisicao']=='ativar'){
-    $query = $pdo->query("UPDATE eventos SET ativo = 1 WHERE id = $postjson[id]");
-    if ($query) {
+    echo $result;
+}
+else if($postjson['requisicao'] == 'ativar'){
+    $query = $pdo->query("update eventos set ativo = 1 where id = $postjson[id]");
+
+    if($query){
         $result = json_encode(array('success' => true, 'msg' => "Evento ativado com sucesso"));
-    } else {
-        $result = json_encode(array('success' => false, 'msg' => "Falha ao ativar o evento!"));
+    }else{
+        $result = json_encode(array('success' => false, 'msg' => "Erro ao ativar evento"));
     }
     echo $result;
 }
