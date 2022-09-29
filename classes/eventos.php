@@ -62,13 +62,14 @@ public function insert(){
 }
 public function update() : bool{
     $sql = new Sql();
-    $res = $sql->query("UPDATE eventos SET nome= :nome, data= :data, capacidade = :capacidade, 
-    WHERE id = :id",
+    $res = $sql->query("UPDATE eventos SET nome= :nome, data= :data, capacidade = :capacidade,
+    usuarios_id = :usuarios_id WHERE id = :id",
     array(
         ":nome"=>$this->getNome(),
         ":id"=>$this->getId(),
         ":data"==$this->getData(),
-        ":capacidade"=>$this->getCapacidade()
+        ":capacidade"=>$this->getCapacidade(),
+        ":usuarios_id"=>$this->getUsuariosId()
     ));
     if($res){
         return true; 
@@ -76,10 +77,14 @@ public function update() : bool{
         return false;
     }
 }
-public function delete(){
+public function delete($_id){
     $sql = new Sql();
-    $sql->query("DELETE FROM eventos WHERE id = :id",array(":id"=>$this->getId()));
+    $res = $sql->querySql("UPDATE eventos set avito = 0 WHERE id = :id",array(":id"=>$_id));
+    return $res;
 }
-
+public function ativar(){
+    $sql = new Sql();
+    $sql->querySql("UPDATE eventos set ativo = 1 WHERE id = :id",array(":id"=>$this->getId()));
+}
 }
 ?>
