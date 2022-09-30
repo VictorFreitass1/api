@@ -69,4 +69,15 @@ else if($postjson['requisicao']=='excluir'){
     }
     echo $result;
 }//final do excluir
+else if($postjson['requisicao']=='ativar'){
+    $user = new Eventos();
+    $user->setId($postjson['id']);
+    $res = $user->ativar();
+    if ($res){
+        $result = json_encode(array('success'=>true, 'msg'=>"Evento Ativado com sucesso!"));
+    }else{
+        $result = json_encode(array('success'=>false,'msg'=>"Falha ao ativar o Evento!"));
+    }
+    echo $result;
+}//final do ativar
 ?>

@@ -79,12 +79,19 @@ public function update() : bool{
 }
 public function delete($_id){
     $sql = new Sql();
-    $res = $sql->querySql("UPDATE eventos set avito = 0 WHERE id = :id",array(":id"=>$_id));
+    $res = $sql->querySql("UPDATE eventos set ativo = 0 WHERE id = :id",array(":id"=>$_id));
     return $res;
 }
 public function ativar(){
     $sql = new Sql();
     $sql->querySql("UPDATE eventos set ativo = 1 WHERE id = :id",array(":id"=>$this->getId()));
+}
+public function __construct($_nome="", $_data="", $_capacidade="", $_usuarios_id="",$_ativo=""){
+    $this->nome = $_nome;
+    $this->data = $_data;
+    $this->capacidade = $_capacidade;
+    $this->usuario_id = $_usuarios_id;
+    $this->ativo = $_ativo;
 }
 }
 ?>
